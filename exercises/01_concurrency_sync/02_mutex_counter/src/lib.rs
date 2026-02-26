@@ -1,37 +1,37 @@
-//! # Mutex 共享状态
+//! # Mutex Shared State
 //!
-//! 本练习中，你需要使用 `Arc<Mutex<T>>` 在多线程间安全地共享和修改数据。
+//! In this exercise, you will use `Arc<Mutex<T>>` to safely share and modify data between multiple threads.
 //!
-//! ## 知识点
-//! - `Mutex<T>` 互斥锁保护共享数据
-//! - `Arc<T>` 原子引用计数实现跨线程共享
-//! - `lock()` 获取锁并访问数据
+//! ## Concepts
+//! - `Mutex<T>` mutex protects shared data
+//! - `Arc<T>` atomic reference counting enables cross-thread sharing
+//! - `lock()` acquires the lock and accesses data
 
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-/// 使用 `n_threads` 个线程并发地对计数器进行递增操作。
-/// 每个线程将计数器增加 `count_per_thread` 次。
-/// 返回最终的计数器值。
+/// Increment a counter concurrently using `n_threads` threads.
+/// Each thread increments the counter `count_per_thread` times.
+/// Returns the final counter value.
 ///
-/// 提示：使用 `Arc<Mutex<usize>>` 作为共享计数器。
+/// Hint: Use `Arc<Mutex<usize>>` as the shared counter.
 pub fn concurrent_counter(n_threads: usize, count_per_thread: usize) -> usize {
-    // TODO: 创建 Arc<Mutex<usize>> 初始值为 0
-    // TODO: 启动 n_threads 个线程
-    // TODO: 每个线程中 lock() 并递增 count_per_thread 次
-    // TODO: join 所有线程，返回最终值
+    // TODO: Create Arc<Mutex<usize>> with initial value 0
+    // TODO: Spawn n_threads threads
+    // TODO: In each thread, lock() and increment count_per_thread times
+    // TODO: Join all threads, return final value
     todo!()
 }
 
-/// 使用多线程并发地向共享向量中添加元素。
-/// 每个线程将自己的 id (0..n_threads) 添加到向量中。
-/// 返回排序后的向量。
+/// Add elements to a shared vector concurrently using multiple threads.
+/// Each thread pushes its own id (0..n_threads) to the vector.
+/// Returns the sorted vector.
 ///
-/// 提示：使用 `Arc<Mutex<Vec<usize>>>`。
+/// Hint: Use `Arc<Mutex<Vec<usize>>>`.
 pub fn concurrent_collect(n_threads: usize) -> Vec<usize> {
-    // TODO: 创建 Arc<Mutex<Vec<usize>>>
-    // TODO: 每个线程 push 自己的 id
-    // TODO: join 所有线程后，对结果排序并返回
+    // TODO: Create Arc<Mutex<Vec<usize>>>
+    // TODO: Each thread pushes its own id
+    // TODO: After joining all threads, sort the result and return
     todo!()
 }
 

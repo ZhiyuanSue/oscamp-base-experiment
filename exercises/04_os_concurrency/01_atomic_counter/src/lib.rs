@@ -1,12 +1,12 @@
-//! # 原子操作基础
+//! # Atomic Operations Basics
 //!
-//! 本练习中，你需要使用原子类型实现无锁的线程安全计数器。
+//! In this exercise, you will use atomic types to implement a lock-free thread‑safe counter.
 //!
-//! ## 知识点
+//! ## Key Concepts
 //! - `std::sync::atomic::AtomicU64`
-//! - `fetch_add`, `fetch_sub`, `load`, `store` 操作
-//! - `compare_exchange` 无锁原语
-//! - `Ordering` 内存序
+//! - `fetch_add`, `fetch_sub`, `load`, `store` operations
+//! - `compare_exchange` lock‑free primitive
+//! - `Ordering` memory ordering
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -21,40 +21,40 @@ impl AtomicCounter {
         }
     }
 
-    /// 原子地增加 1，返回增加**前**的值。
+    /// Atomically increments by 1, returns the value **before** increment.
     ///
-    /// 提示：使用 `fetch_add` 和 `Ordering::Relaxed`
+    /// Hint: use `fetch_add` with `Ordering::Relaxed`
     pub fn increment(&self) -> u64 {
         // TODO
         todo!()
     }
 
-    /// 原子地减少 1，返回减少**前**的值。
+    /// Atomically decrements by 1, returns the value **before** decrement.
     pub fn decrement(&self) -> u64 {
         // TODO
         todo!()
     }
 
-    /// 获取当前值。
+    /// Gets the current value.
     pub fn get(&self) -> u64 {
         // TODO
         todo!()
     }
 
-    /// 原子 CAS（Compare-And-Swap）操作。
-    /// 如果当前值等于 `expected`，则设为 `new_val`，返回 Ok(expected)。
-    /// 否则返回 Err(当前实际值)。
+    /// Atomic CAS (Compare-And-Swap) operation.
+    /// If current value equals `expected`, set to `new_val` and return Ok(expected).
+    /// Otherwise return Err(actual current value).
     ///
-    /// 提示：使用 `compare_exchange`，成功序使用 `Ordering::AcqRel`，失败序使用 `Ordering::Acquire`
+    /// Hint: use `compare_exchange` with success ordering `Ordering::AcqRel` and failure ordering `Ordering::Acquire`
     pub fn compare_and_swap(&self, expected: u64, new_val: u64) -> Result<u64, u64> {
         // TODO
         todo!()
     }
 
-    /// 使用 CAS 循环实现原子地将值乘以 `multiplier`。
-    /// 返回乘法**前**的值。
+    /// Multiply the value atomically using a CAS loop.
+    /// Returns the value **before** multiplication.
     ///
-    /// 提示：在循环中读取当前值，计算新值，CAS 尝试更新，失败则重试。
+    /// Hint: read current value in loop, compute new value, try CAS to update, retry on failure.
     pub fn fetch_multiply(&self, multiplier: u64) -> u64 {
         // TODO: CAS loop
         // loop {

@@ -1,35 +1,35 @@
-//! # Channel 通道通信
+//! # Channel Communication
 //!
-//! 本练习中，你需要使用 `std::sync::mpsc` 通道在线程间传递消息。
+//! In this exercise, you will use `std::sync::mpsc` channels to pass messages between threads.
 //!
-//! ## 知识点
-//! - `mpsc::channel()` 创建多生产者单消费者通道
-//! - `Sender::send()` 发送消息
-//! - `Receiver::recv()` 接收消息
-//! - 多个生产者可通过 `Sender::clone()` 创建
+//! ## Concepts
+//! - `mpsc::channel()` creates a multiple producer, single consumer channel
+//! - `Sender::send()` sends a message
+//! - `Receiver::recv()` receives a message
+//! - Multiple producers can be created via `Sender::clone()`
 
 use std::sync::mpsc;
 use std::thread;
 
-/// 创建一个生产者线程，将 items 中的元素逐个发送到通道。
-/// 主线程接收所有消息并返回。
+/// Create a producer thread that sends each element from items into the channel.
+/// The main thread receives all messages and returns them.
 pub fn simple_send_recv(items: Vec<String>) -> Vec<String> {
-    // TODO: 创建 channel
-    // TODO: spawn 线程发送 items 中每个元素
-    // TODO: 在主线程中接收所有消息并收集到 Vec
-    // 提示：当所有 Sender 被 drop 后，recv() 会返回 Err
+    // TODO: Create channel
+    // TODO: Spawn thread to send each element in items
+    // TODO: In main thread, receive all messages and collect into Vec
+    // Hint: When all Senders are dropped, recv() returns Err
     todo!()
 }
 
-/// 创建 `n_producers` 个生产者线程，每个线程发送 `"msg from {id}"` 格式的消息。
-/// 收集所有消息，按字典序排序后返回。
+/// Create `n_producers` producer threads, each sending a message in format `"msg from {id}"`.
+/// Collect all messages, sort them lexicographically, and return.
 ///
-/// 提示：使用 `tx.clone()` 创建多个发送端。注意原始 tx 也需要被 drop。
+/// Hint: Use `tx.clone()` to create multiple senders. Note that the original tx must also be dropped.
 pub fn multi_producer(n_producers: usize) -> Vec<String> {
-    // TODO: 创建 channel
-    // TODO: 为每个生产者 clone 一个 sender
-    // TODO: 注意 drop 原始 sender，否则 receiver 不会结束
-    // TODO: 收集所有消息并排序
+    // TODO: Create channel
+    // TODO: Clone a sender for each producer
+    // TODO: Remember to drop the original sender, otherwise receiver won't finish
+    // TODO: Collect all messages and sort
     todo!()
 }
 

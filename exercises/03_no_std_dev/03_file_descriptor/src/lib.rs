@@ -1,14 +1,14 @@
-//! # 文件描述符操作
+//! # File Descriptor Operations
 //!
-//! 本练习中，你需要使用原始系统调用操作文件描述符，理解 Unix 文件 I/O 的底层机制。
+//! In this exercise, you will use raw system calls to operate on file descriptors, understanding the low-level mechanisms of Unix file I/O.
 //!
-//! ## 知识点
-//! - 文件描述符 (fd) 是 Unix I/O 的核心抽象
+//! ## Concepts
+//! - File descriptor (fd) is the core abstraction of Unix I/O
 //! - open (syscall 2), read (syscall 0), write (syscall 1), close (syscall 3)
-//! - O_CREAT, O_WRONLY, O_RDONLY 等标志位
-//! - RAII 模式管理文件描述符生命周期
+//! - Flags like O_CREAT, O_WRONLY, O_RDONLY
+//! - RAII pattern for managing file descriptor lifecycle
 //!
-//! ## x86_64 Linux 系统调用号
+//! ## x86_64 Linux System Call Numbers
 //! - read: 0
 //! - write: 1
 //! - open: 2
@@ -16,7 +16,7 @@
 
 use std::arch::asm;
 
-/// 原始 syscall 辅助函数（3 参数）
+/// Raw syscall helper function (3 arguments)
 #[cfg(target_os = "linux")]
 unsafe fn syscall3(nr: u64, a1: u64, a2: u64, a3: u64) -> i64 {
     let ret: i64;
@@ -33,7 +33,7 @@ unsafe fn syscall3(nr: u64, a1: u64, a2: u64, a3: u64) -> i64 {
     ret
 }
 
-/// 原始 syscall 辅助函数（1 参数）
+/// Raw syscall helper function (1 argument)
 #[cfg(target_os = "linux")]
 unsafe fn syscall1(nr: u64, a1: u64) -> i64 {
     let ret: i64;
@@ -58,14 +58,14 @@ const O_WRONLY: u64 = 1;
 const O_CREAT: u64 = 0o100;
 const O_TRUNC: u64 = 0o1000;
 
-/// RAII 文件描述符包装器。
-/// Drop 时自动关闭 fd。
+/// RAII file descriptor wrapper.
+/// Automatically closes fd when dropped.
 pub struct FileDesc {
     fd: i32,
 }
 
 impl FileDesc {
-    /// 用已有的 fd 值创建 FileDesc
+    /// Creates a FileDesc from an existing fd value
     pub fn from_raw(fd: i32) -> Self {
         Self { fd }
     }
@@ -75,8 +75,8 @@ impl FileDesc {
     }
 }
 
-// TODO: 为 FileDesc 实现 Drop trait
-// 调用 close 系统调用关闭文件描述符
+// TODO: Implement Drop trait for FileDesc
+// Calls the close system call to close the file descriptor
 #[cfg(target_os = "linux")]
 impl Drop for FileDesc {
     fn drop(&mut self) {
@@ -89,40 +89,40 @@ impl Drop for FileDesc {
     fn drop(&mut self) {}
 }
 
-/// 使用 open 系统调用创建/打开文件用于写入。
-/// 返回文件描述符，失败返回 Err(errno)。
+/// Creates/opens a file for writing using the open system call.
+/// Returns a file descriptor, or Err(errno) on failure.
 ///
 /// flags = O_WRONLY | O_CREAT | O_TRUNC
 /// mode = 0o644
 #[cfg(target_os = "linux")]
 pub fn open_for_write(path: &str) -> Result<FileDesc, i64> {
-    // TODO: 构造 C 风格的路径（末尾加 \0）
-    // TODO: 调用 syscall3(SYS_OPEN, path_ptr, flags, mode)
-    // TODO: 如果返回值 < 0，返回 Err
-    // TODO: 否则返回 Ok(FileDesc::from_raw(fd))
+    // TODO: Construct a C-style path (append \0)
+    // TODO: Call syscall3(SYS_OPEN, path_ptr, flags, mode)
+    // TODO: If return value < 0, return Err
+    // TODO: Otherwise return Ok(FileDesc::from_raw(fd))
     todo!()
 }
 
-/// 使用 open 系统调用打开文件用于读取。
+/// Opens a file for reading using the open system call.
 #[cfg(target_os = "linux")]
 pub fn open_for_read(path: &str) -> Result<FileDesc, i64> {
-    // TODO: 类似 open_for_write，但 flags = O_RDONLY, mode = 0
+    // TODO: Similar to open_for_write, but flags = O_RDONLY, mode = 0
     todo!()
 }
 
-/// 使用 write 系统调用写入数据。
+/// Writes data using the write system call.
 #[cfg(target_os = "linux")]
 pub fn fd_write(fd: &FileDesc, buf: &[u8]) -> Result<usize, i64> {
-    // TODO: 调用 syscall3(SYS_WRITE, fd, buf_ptr, buf_len)
-    // TODO: 返回写入字节数或错误码
+    // TODO: Call syscall3(SYS_WRITE, fd, buf_ptr, buf_len)
+    // TODO: Return number of bytes written or error code
     todo!()
 }
 
-/// 使用 read 系统调用读取数据。
+/// Reads data using the read system call.
 #[cfg(target_os = "linux")]
 pub fn fd_read(fd: &FileDesc, buf: &mut [u8]) -> Result<usize, i64> {
-    // TODO: 调用 syscall3(SYS_READ, fd, buf_ptr, buf_len)
-    // TODO: 返回读取字节数或错误码
+    // TODO: Call syscall3(SYS_READ, fd, buf_ptr, buf_len)
+    // TODO: Return number of bytes read or error code
     todo!()
 }
 
@@ -137,15 +137,15 @@ mod tests {
         let path = "/tmp/oscamp_fd_test.txt";
         let content = b"hello from raw fd!";
 
-        // 写入
+        // Write
         {
             let fd = open_for_write(path).expect("open for write failed");
             let n = fd_write(&fd, content).expect("write failed");
             assert_eq!(n, content.len());
-            // fd 在此处 drop，自动 close
+            // fd drops here, automatically closes
         }
 
-        // 读取
+        // Read
         {
             let fd = open_for_read(path).expect("open for read failed");
             let mut buf = vec![0u8; 128];
@@ -171,7 +171,7 @@ mod tests {
             fd_val = fd.raw();
             // fd drops here
         }
-        // 验证 fd 已关闭：尝试写入应失败
+        // Verify fd is closed: attempting to write should fail
         let ret = unsafe { syscall3(SYS_WRITE, fd_val as u64, b"x".as_ptr() as u64, 1) };
         assert!(ret < 0, "fd should be closed after drop");
         fs::remove_file(path).ok();

@@ -1,24 +1,24 @@
-//! # 内存序与同步
+//! # Memory Ordering and Synchronization
 //!
-//! 本练习中，你需要使用正确的内存序实现线程间的同步原语。
+//! In this exercise, you will use correct memory ordering to implement thread synchronization primitives.
 //!
-//! ## 知识点
-//! - `Ordering::Relaxed`: 无同步保证
-//! - `Ordering::Acquire`: 读操作，阻止后续读写重排到此操作之前
-//! - `Ordering::Release`: 写操作，阻止之前的读写重排到此操作之后
-//! - `Ordering::AcqRel`: 同时具有 Acquire 和 Release 语义
-//! - `Ordering::SeqCst`: 全局顺序一致
+//! ## Key Concepts
+//! - `Ordering::Relaxed`: No synchronization guarantees
+//! - `Ordering::Acquire`: Read operation, prevents subsequent reads/writes from being reordered before this operation
+//! - `Ordering::Release`: Write operation, prevents preceding reads/writes from being reordered after this operation
+//! - `Ordering::AcqRel`: Both Acquire and Release semantics
+//! - `Ordering::SeqCst`: Sequentially consistent (global ordering)
 //!
-//! ## Release-Acquire 配对
-//! 当线程 A 使用 Release 写入，线程 B 使用 Acquire 读取同一位置时，
-//! 线程 B 能看到线程 A 在 Release 之前的所有写入。
+//! ## Release-Acquire Pairing
+//! When thread A writes with Release, and thread B reads the same location with Acquire,
+//! thread B will see all writes that thread A performed before the Release.
 
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-/// 使用 Release-Acquire 语义在两个线程间安全地传递数据。
-///
-/// `produce` 先写数据，再用 Release 设置 flag；
-/// `consume` 用 Acquire 读 flag，确保能看到数据。
+    /// Use Release-Acquire semantics to safely pass data between two threads.
+    ///
+    /// `produce` writes data first, then sets flag with Release;
+    /// `consume` reads flag with Acquire, ensuring it sees the data.
 pub struct FlagChannel {
     data: AtomicU32,
     ready: AtomicBool,
@@ -32,37 +32,37 @@ impl FlagChannel {
         }
     }
 
-    /// 生产者：先存储数据，再设置 ready 标志。
+    /// Producer: store data first, then set ready flag.
     ///
-    /// TODO: 选择正确的 Ordering
-    /// - data 的写入应该使用什么 Ordering?
-    /// - ready 的写入应该使用什么 Ordering?（确保 data 的写入对消费者可见）
+    /// TODO: Choose correct Ordering
+    /// - What Ordering should be used for writing data?
+    /// - What Ordering should be used for writing ready? (ensuring data writes are visible to consumer)
     pub fn produce(&self, value: u32) {
-        // TODO: 存储 data（选择合适的 Ordering）
-        // TODO: 设置 ready = true（选择合适的 Ordering，使得 data 的写入在此之前完成）
+        // TODO: Store data (choose appropriate Ordering)
+        // TODO: Set ready = true (choose appropriate Ordering so data writes complete before this)
         todo!()
     }
 
-    /// 消费者：自旋等待 ready 标志，然后读取数据。
+    /// Consumer: spin-wait for ready flag, then read data.
     ///
-    /// TODO: 选择正确的 Ordering
-    /// - ready 的读取应该使用什么 Ordering?（确保能看到 produce 中 data 的写入）
-    /// - data 的读取应该使用什么 Ordering?
+    /// TODO: Choose correct Ordering
+    /// - What Ordering should be used for reading ready? (ensuring it sees data writes from produce)
+    /// - What Ordering should be used for reading data?
     pub fn consume(&self) -> u32 {
-        // TODO: 自旋等待 ready 变为 true（选择合适的 Ordering）
-        // TODO: 读取 data（选择合适的 Ordering）
+        // TODO: Spin-wait for ready to become true (choose appropriate Ordering)
+        // TODO: Read data (choose appropriate Ordering)
         todo!()
     }
 
-    /// 重置通道状态
+    /// Reset channel state
     pub fn reset(&self) {
         self.ready.store(false, Ordering::Relaxed);
         self.data.store(0, Ordering::Relaxed);
     }
 }
 
-/// 使用 SeqCst 实现一个简单的一次性初始化器。
-/// 保证 `init` 只被执行一次，且所有线程都能看到初始化后的值。
+/// A simple once-initializer using SeqCst.
+/// Guarantees `init` is executed only once, and all threads see the initialized value.
 pub struct OnceCell {
     initialized: AtomicBool,
     value: AtomicU32,
@@ -76,19 +76,19 @@ impl OnceCell {
         }
     }
 
-    /// 尝试初始化。如果尚未初始化，存储值并返回 true。
-    /// 如果已初始化，返回 false。
+    /// Attempt initialization. If not yet initialized, store value and return true.
+    /// If already initialized, return false.
     ///
-    /// 提示：使用 `compare_exchange` 保证只有一个线程成功。
+    /// Hint: use `compare_exchange` to ensure only one thread succeeds.
     pub fn init(&self, val: u32) -> bool {
-        // TODO: 使用 compare_exchange 确保只初始化一次
-        // 成功时存储 value
+        // TODO: Use compare_exchange to ensure initialization only once
+        // Store value on success
         todo!()
     }
 
-    /// 获取值。如果已初始化返回 Some，否则返回 None。
+    /// Get value. Returns Some if initialized, otherwise None.
     pub fn get(&self) -> Option<u32> {
-        // TODO: 检查 initialized 标志，然后读取 value
+        // TODO: Check initialized flag, then read value
         todo!()
     }
 }
@@ -156,7 +156,7 @@ mod tests {
         }
 
         let results: Vec<bool> = handles.into_iter().map(|h| h.join().unwrap()).collect();
-        // 恰好一个线程初始化成功
+        // Exactly one thread initializes successfully
         assert_eq!(results.iter().filter(|&&r| r).count(), 1);
         assert!(cell.get().is_some());
     }

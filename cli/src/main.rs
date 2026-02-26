@@ -53,7 +53,7 @@ fn main() {
         Some("hint") => hint_mode(&exercises, args.get(2)),
         Some("help" | "--help" | "-h") => print_usage(),
         Some(other) => {
-            eprintln!("未知命令: {other}");
+            eprintln!("Unknown command: {other}");
             print_usage();
             std::process::exit(1);
         }
@@ -63,11 +63,11 @@ fn main() {
 fn load_exercises() -> Vec<Exercise> {
     for path in ["exercises.toml", "../exercises.toml"] {
         if let Ok(content) = std::fs::read_to_string(path) {
-            let config: Config = toml::from_str(&content).expect("exercises.toml 格式错误");
+            let config: Config = toml::from_str(&content).expect("exercises.toml format error");
             return config.exercise;
         }
     }
-    eprintln!("{RED}错误:{RESET} 找不到 exercises.toml，请在项目根目录运行");
+    eprintln!("{RED}Error:{RESET} Could not find exercises.toml, please run in project root directory");
     std::process::exit(1);
 }
 
@@ -75,7 +75,7 @@ fn test_exercise(ex: &Exercise) -> TestResult {
     let output = Command::new("cargo")
         .args(["test", "-p", &ex.package, "--", "--color=always"])
         .output()
-        .expect("无法运行 cargo test");
+        .expect("Failed to run cargo test");
 
     TestResult {
         passed: output.status.success(),
@@ -114,12 +114,12 @@ fn watch_mode(exercises: &[Exercise]) {
     let total = exercises.len();
     let mut stdout = io::stdout();
 
-    println!("{BOLD}{BLUE}OS Camp{RESET} - 正在扫描练习进度...\n");
+    println!("{BOLD}{BLUE}OS Camp{RESET} - Scanning exercise progress...\n");
 
     let mut done = vec![false; total];
     let mut current = total;
     for (i, ex) in exercises.iter().enumerate() {
-        print!("  [{:2}/{total}] 检查 {:<25}\r", i + 1, ex.package);
+        print!("  [{:2}/{total}] Checking {:<25}\r", i + 1, ex.package);
         stdout.flush().unwrap();
         if test_quiet(ex) {
             done[i] = true;
@@ -133,11 +133,11 @@ fn watch_mode(exercises: &[Exercise]) {
     }
 
     if current == total {
-        println!("\n\n  {BOLD}{GREEN}🎉 恭喜！所有 {total} 个练习全部通过！{RESET}");
+        println!("\n\n  {BOLD}{GREEN}🎉 Congratulations! All {total} exercises passed!{RESET}");
         return;
     }
 
-    terminal::enable_raw_mode().expect("无法启用终端 raw 模式");
+    terminal::enable_raw_mode().expect("Failed to enable terminal raw mode");
 
     let (fs_tx, fs_rx) = mpsc::channel::<()>();
     let mut watcher = RecommendedWatcher::new(
@@ -150,7 +150,7 @@ fn watch_mode(exercises: &[Exercise]) {
         },
         notify::Config::default(),
     )
-    .expect("无法创建文件监听器");
+    .expect("Failed to create file watcher");
     watcher
         .watch(Path::new("exercises"), RecursiveMode::Recursive)
         .ok();
@@ -171,7 +171,7 @@ fn watch_mode(exercises: &[Exercise]) {
             rprintln(&mut stdout, "");
             rprintln(
                 &mut stdout,
-                &format!("  {YELLOW}⏳ 正在测试 {}...{RESET}", exercises[current].package),
+                &format!("  {YELLOW}⏳ Testing {}...{RESET}", exercises[current].package),
             );
             stdout.flush().unwrap();
 
@@ -184,14 +184,14 @@ fn watch_mode(exercises: &[Exercise]) {
                 render_header(&mut stdout, exercises, current, count_done(&done));
                 rprintln(
                     &mut stdout,
-                    &format!("\n  {BOLD}{GREEN}✅ 练习「{}」测试通过！{RESET}", exercises[current].name),
+                    &format!("\n  {BOLD}{GREEN}✅ Exercise '{}' passed!{RESET}", exercises[current].name),
                 );
 
                 if let Some(next) = find_next_incomplete(&done, current) {
                     current = next;
                     rprintln(
                         &mut stdout,
-                        &format!("\n  ➡  自动跳转: {CYAN}{}{RESET}", exercises[current].name),
+                        &format!("\n  ➡  Auto-jump: {CYAN}{}{RESET}", exercises[current].name),
                     );
                     stdout.flush().unwrap();
                     std::thread::sleep(Duration::from_millis(800));
@@ -202,9 +202,9 @@ fn watch_mode(exercises: &[Exercise]) {
                     rprintln(&mut stdout, "");
                     rprintln(
                         &mut stdout,
-                        &format!("  {BOLD}{GREEN}🎉 恭喜！所有 {total} 个练习全部通过！{RESET}"),
+                        &format!("  {BOLD}{GREEN}🎉 Congratulations! All {total} exercises passed!{RESET}"),
                     );
-                    rprintln(&mut stdout, &format!("\n  按 {BOLD}q{RESET} 退出"));
+                    rprintln(&mut stdout, &format!("\n  Press {BOLD}q{RESET} to quit"));
                     stdout.flush().unwrap();
                     wait_for_quit();
                     break;
@@ -278,7 +278,7 @@ fn watch_mode(exercises: &[Exercise]) {
 
     terminal::disable_raw_mode().unwrap();
     execute!(stdout, cursor::MoveTo(0, 0), Clear(ClearType::All)).unwrap();
-    println!("再见！继续加油 💪");
+    println!("Goodbye! Keep up the good work 💪");
 }
 
 fn find_next_incomplete(done: &[bool], current: usize) -> Option<usize> {
@@ -325,27 +325,27 @@ fn render_header(out: &mut impl Write, exercises: &[Exercise], current: usize, d
     let ex = &exercises[current];
     let bar = progress_bar(done, total, 20);
 
-    rprintln(out, &format!("{BOLD}{BLUE}─── OS Camp ─── Rust & OS 进阶实验 ───{RESET}"));
-    rprintln(out, &format!("  进度: {bar}"));
+    rprintln(out, &format!("{BOLD}{BLUE}─── OS Camp ─── Rust & OS Advanced Experiments ───{RESET}"));
+    rprintln(out, &format!("  Progress: {bar}"));
     rprintln(out, "");
     rprintln(
         out,
-        &format!("  {BOLD}▶ 练习 {}/{total}: {}{RESET}", current + 1, ex.name),
+        &format!("  {BOLD}▶ Exercise {}/{total}: {}{RESET}", current + 1, ex.name),
     );
-    rprintln(out, &format!("    {DIM}模块:{RESET} {}", ex.module));
+    rprintln(out, &format!("    {DIM}Module:{RESET} {}", ex.module));
     rprintln(out, &format!("    {CYAN}{}{RESET}", ex.description));
     rprintln(out, &format!("    {DIM}📄 {}{RESET}", ex.path));
 }
 
 fn render_failure(out: &mut impl Write, result: &TestResult) {
-    rprintln(out, &format!("\n  {BOLD}{RED}❌ 测试未通过{RESET}\n"));
+    rprintln(out, &format!("\n  {BOLD}{RED}❌ Test failed{RESET}\n"));
 
     let lines: Vec<&str> = result.output.lines().collect();
     let max_lines = 30;
     let start = lines.len().saturating_sub(max_lines);
 
     if start > 0 {
-        rprintln(out, &format!("  {DIM}... 省略 {start} 行 ...{RESET}"));
+        rprintln(out, &format!("  {DIM}... omitted {start} lines ...{RESET}"));
     }
     for line in &lines[start..] {
         rprintln(out, &format!("  {line}"));
@@ -358,26 +358,26 @@ fn render_controls(out: &mut impl Write) {
     rprintln(
         out,
         &format!(
-            "  {BOLD}h{RESET}提示  {BOLD}l{RESET}列表  \
-             {BOLD}n{RESET}/{BOLD}p{RESET}上/下题  \
-             {BOLD}r{RESET}重测  {BOLD}q{RESET}退出"
+            "  {BOLD}h{RESET} hint  {BOLD}l{RESET} list  \
+             {BOLD}n{RESET}/{BOLD}p{RESET} prev/next  \
+             {BOLD}r{RESET} retest  {BOLD}q{RESET} quit"
         ),
     );
     rprintln(
         out,
-        &format!("  {DIM}📡 监听文件变化中，保存文件后自动重新测试{RESET}"),
+        &format!("  {DIM}📡 Watching for file changes, automatically retests after saving{RESET}"),
     );
 }
 
 fn render_hint(out: &mut impl Write, ex: &Exercise) {
-    rprintln(out, &format!("\n  {BOLD}{YELLOW}💡 提示:{RESET}"));
+    rprintln(out, &format!("\n  {BOLD}{YELLOW}💡 Hint:{RESET}"));
     for line in ex.hint.lines() {
         rprintln(out, &format!("  {YELLOW}{line}{RESET}"));
     }
 }
 
 fn render_list(out: &mut impl Write, exercises: &[Exercise], current: usize, done: &[bool]) {
-    rprintln(out, &format!("\n  {BOLD}{BLUE}练习列表:{RESET}\n"));
+    rprintln(out, &format!("\n  {BOLD}{BLUE}Exercise list:{RESET}\n"));
 
     let mut cur_module = String::new();
     for (i, ex) in exercises.iter().enumerate() {
@@ -417,7 +417,7 @@ fn full_redraw(
         render_header(out, exercises, current, done_n);
         if let Some(ref r) = result {
             if r.passed {
-                rprintln(out, &format!("\n  {BOLD}{GREEN}✅ 测试通过！{RESET}"));
+                rprintln(out, &format!("\n  {BOLD}{GREEN}✅ Test passed!{RESET}"));
             } else {
                 render_failure(out, r);
             }
@@ -433,7 +433,7 @@ fn full_redraw(
 // ─────────────────────── other modes ───────────────────────
 
 fn list_mode(exercises: &[Exercise]) {
-    println!("{BOLD}{BLUE}OS Camp - 练习列表{RESET}\n");
+    println!("{BOLD}{BLUE}OS Camp - Exercise list{RESET}\n");
 
     let mut cur_module = String::new();
     let mut done = 0;
@@ -462,11 +462,11 @@ fn list_mode(exercises: &[Exercise]) {
 
     let total = exercises.len();
     let bar = progress_bar(done, total, 20);
-    println!("\n  进度: {bar}\n");
+    println!("\n  Progress: {bar}\n");
 }
 
 fn check_mode(exercises: &[Exercise]) {
-    println!("{BOLD}{BLUE}OS Camp - 检查所有练习{RESET}\n");
+    println!("{BOLD}{BLUE}OS Camp - Check all exercises{RESET}\n");
 
     let total = exercises.len();
     let mut done = 0;
@@ -482,15 +482,15 @@ fn check_mode(exercises: &[Exercise]) {
         }
     }
 
-    println!("\n  {BOLD}结果: {done}/{total} 通过{RESET}");
+    println!("\n  {BOLD}Result: {done}/{total} passed{RESET}");
     if done == total {
-        println!("  {GREEN}🎉 全部通过！{RESET}");
+        println!("  {GREEN}🎉 All passed!{RESET}");
     }
 }
 
 fn run_mode(exercises: &[Exercise], name: Option<&String>) {
     let name = name.unwrap_or_else(|| {
-        eprintln!("用法: oscamp run <包名>");
+        eprintln!("Usage: oscamp run <package>");
         std::process::exit(1);
     });
     let ex = find_exercise(exercises, name);
@@ -502,20 +502,20 @@ fn run_mode(exercises: &[Exercise], name: Option<&String>) {
     print!("{}", result.output);
 
     if result.passed {
-        println!("\n{BOLD}{GREEN}✅ 测试通过！{RESET}");
+        println!("\n{BOLD}{GREEN}✅ Test passed!{RESET}");
     } else {
-        println!("\n{BOLD}{RED}❌ 测试未通过{RESET}");
-        println!("  💡 使用 'oscamp hint {name}' 查看提示");
+        println!("\n{BOLD}{RED}❌ Test failed{RESET}");
+        println!("  💡 Use 'oscamp hint {name}' to view hint");
     }
 }
 
 fn hint_mode(exercises: &[Exercise], name: Option<&String>) {
     let name = name.unwrap_or_else(|| {
-        eprintln!("用法: oscamp hint <包名>");
+        eprintln!("Usage: oscamp hint <package>");
         std::process::exit(1);
     });
     let ex = find_exercise(exercises, name);
-    println!("{BOLD}{YELLOW}💡 {} - 提示:{RESET}\n", ex.name);
+    println!("{BOLD}{YELLOW}💡 {} - Hint:{RESET}\n", ex.name);
     println!("{}", ex.hint);
 }
 
@@ -524,20 +524,20 @@ fn find_exercise<'a>(exercises: &'a [Exercise], name: &str) -> &'a Exercise {
         .iter()
         .find(|e| e.package == name)
         .unwrap_or_else(|| {
-            eprintln!("未找到练习: {name}");
-            eprintln!("使用 'oscamp list' 查看所有练习");
+            eprintln!("Exercise not found: {name}");
+            eprintln!("Use 'oscamp list' to see all exercises");
             std::process::exit(1);
         })
 }
 
 fn print_usage() {
-    println!("{BOLD}{BLUE}OS Camp{RESET} - Rust & OS 进阶实验\n");
-    println!("用法: oscamp [命令]\n");
-    println!("命令:");
-    println!("  {BOLD}watch{RESET}    交互式练习模式（默认）- 实时监测文件变化");
-    println!("  {BOLD}list{RESET}     查看所有练习完成状态");
-    println!("  {BOLD}check{RESET}    批量检查所有练习");
-    println!("  {BOLD}run{RESET}      运行指定练习  (oscamp run <包名>)");
-    println!("  {BOLD}hint{RESET}     查看练习提示  (oscamp hint <包名>)");
-    println!("  {BOLD}help{RESET}     显示此帮助信息");
+    println!("{BOLD}{BLUE}OS Camp{RESET} - Rust & OS Advanced Experiments\n");
+    println!("Usage: oscamp [command]\n");
+    println!("Commands:");
+    println!("  {BOLD}watch{RESET}    Interactive exercise mode (default) - real-time file monitoring");
+    println!("  {BOLD}list{RESET}     View completion status of all exercises");
+    println!("  {BOLD}check{RESET}    Check all exercises in batch");
+    println!("  {BOLD}run{RESET}      Run specified exercise  (oscamp run <package>)");
+    println!("  {BOLD}hint{RESET}     View exercise hint  (oscamp hint <package>)");
+    println!("  {BOLD}help{RESET}     Show this help message");
 }

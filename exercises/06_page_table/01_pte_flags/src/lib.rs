@@ -1,14 +1,14 @@
-//! # 页表项标志位
+//! # Page Table Entry Flags
 //!
-//! 本练习中，你需要学习 RISC-V SV39 页表项（Page Table Entry）的结构，
-//! 并通过位操作来构造和解析页表项。
+//! In this exercise, you will learn the structure of RISC-V SV39 Page Table Entry (PTE),
+//! and construct/parse page table entries through bit operations.
 //!
-//! ## 知识点
-//! - RISC-V SV39 页表项的 64 位布局
-//! - 位运算构造/提取字段
-//! - 页表项标志位的含义（V/R/W/X/U/G/A/D）
+//! ## Concepts
+//! - RISC-V SV39 page table entry 64-bit layout
+//! - Bit operations to construct/extract fields
+//! - Meaning of PTE flags (V/R/W/X/U/G/A/D)
 //!
-//! ## SV39 PTE 布局（64 位）
+//! ## SV39 PTE Layout (64-bit)
 //! ```text
 //! 63    54 53        10 9  8 7 6 5 4 3 2 1 0
 //! ┌───────┬────────────┬────┬─┬─┬─┬─┬─┬─┬─┬─┐
@@ -17,7 +17,7 @@
 //! └───────┴────────────┴────┴─┴─┴─┴─┴─┴─┴─┴─┘
 //! ```
 
-/// 页表项标志位常量
+/// PTE flag constants
 pub const PTE_V: u64 = 1 << 0; // Valid
 pub const PTE_R: u64 = 1 << 1; // Readable
 pub const PTE_W: u64 = 1 << 2; // Writable
@@ -27,61 +27,61 @@ pub const PTE_G: u64 = 1 << 5; // Global
 pub const PTE_A: u64 = 1 << 6; // Accessed
 pub const PTE_D: u64 = 1 << 7; // Dirty
 
-/// PPN 字段在 PTE 中的位移和掩码
+/// PPN field offset and mask in PTE
 const PPN_SHIFT: u32 = 10;
-const PPN_MASK: u64 = (1u64 << 44) - 1; // 44 位 PPN
+const PPN_MASK: u64 = (1u64 << 44) - 1; // 44-bit PPN
 
-/// 根据物理页号 (PPN) 和标志位构造一个页表项。
+/// Construct a page table entry from physical page number (PPN) and flags.
 ///
-/// PPN 占据 bits [53:10]，标志位占据 bits [7:0]。
+/// PPN occupies bits [53:10], flags occupy bits [7:0].
 ///
-/// 示例：ppn=0x12345, flags=PTE_V|PTE_R|PTE_W
-/// 结果应为：(0x12345 << 10) | 0b111 = 0x48D14007
+/// Example: ppn=0x12345, flags=PTE_V|PTE_R|PTE_W
+/// Result should be: (0x12345 << 10) | 0b111 = 0x48D14007
 ///
-/// 提示：将 PPN 左移 PPN_SHIFT 位，然后与 flags 做按位或。
+/// Hint: Shift PPN left by PPN_SHIFT bits, then OR with flags.
 pub fn make_pte(ppn: u64, flags: u64) -> u64 {
-    // TODO: 用 ppn 和 flags 构造页表项
+    // TODO: Construct page table entry using ppn and flags
     todo!()
 }
 
-/// 从页表项中提取物理页号 (PPN)。
+/// Extract physical page number (PPN) from page table entry.
 ///
-/// 提示：右移 PPN_SHIFT 位后，用 PPN_MASK 做按位与。
+/// Hint: Right shift by PPN_SHIFT bits, then AND with PPN_MASK.
 pub fn extract_ppn(pte: u64) -> u64 {
-    // TODO: 从 pte 中提取 PPN
+    // TODO: Extract PPN from pte
     todo!()
 }
 
-/// 从页表项中提取标志位（低 8 位）。
+/// Extract flags (lower 8 bits) from page table entry.
 pub fn extract_flags(pte: u64) -> u64 {
-    // TODO: 提取低 8 位标志
+    // TODO: Extract lower 8-bit flags
     todo!()
 }
 
-/// 检查页表项是否有效（V 位是否置位）。
+/// Check whether page table entry is valid (V bit set).
 pub fn is_valid(pte: u64) -> bool {
-    // TODO: 检查 PTE_V
+    // TODO: Check PTE_V
     todo!()
 }
 
-/// 判断页表项是否为叶节点（leaf PTE）。
+/// Determine whether page table entry is a leaf PTE.
 ///
-/// 在 SV39 中，如果 R、W、X 中任意一位被置位，该 PTE 就是叶节点，
-/// 指向最终的物理页。否则它指向下一级页表。
+/// In SV39, if any of R, W, X bits is set, the PTE is a leaf,
+/// pointing to the final physical page. Otherwise it points to next-level page table.
 pub fn is_leaf(pte: u64) -> bool {
-    // TODO: 检查 R/W/X 中是否有任意一位被置位
+    // TODO: Check if any of R/W/X bits is set
     todo!()
 }
 
-/// 根据给定的权限检查页表项是否允许该访问。
+/// Check whether page table entry permits the requested access based on given permissions.
 ///
-/// - `read`: 需要可读权限
-/// - `write`: 需要可写权限
-/// - `execute`: 需要可执行权限
+/// - `read`: requires read permission
+/// - `write`: requires write permission
+/// - `execute`: requires execute permission
 ///
-/// 返回 true 当且仅当：PTE 有效，且所需的每种权限都被满足。
+/// Returns true iff: PTE is valid, and each requested permission is satisfied.
 pub fn check_permission(pte: u64, read: bool, write: bool, execute: bool) -> bool {
-    // TODO: 先检查是否 valid，再逐一检查所需权限
+    // TODO: First check if valid, then check each requested permission
     todo!()
 }
 
@@ -114,7 +114,7 @@ mod tests {
 
     #[test]
     fn test_make_pte_large_ppn() {
-        let ppn = (1u64 << 44) - 1; // 最大 PPN
+        let ppn = (1u64 << 44) - 1; // maximum PPN
         let pte = make_pte(ppn, PTE_V);
         assert_eq!(extract_ppn(pte), ppn);
     }
@@ -131,7 +131,7 @@ mod tests {
         assert!(is_leaf(make_pte(1, PTE_V | PTE_R)));
         assert!(is_leaf(make_pte(1, PTE_V | PTE_X)));
         assert!(is_leaf(make_pte(1, PTE_V | PTE_R | PTE_W | PTE_X)));
-        // 非叶节点：仅 V 被置位，R/W/X 都未置位
+        // Non-leaf: only V set, R/W/X all cleared
         assert!(!is_leaf(make_pte(1, PTE_V)));
         assert!(!is_leaf(make_pte(1, PTE_V | PTE_A | PTE_D)));
     }
@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_check_permission_invalid() {
-        // V 未置位，即使有 R/W/X 标志也应返回 false
+        // V not set, should return false even if R/W/X flags present
         let pte = make_pte(1, PTE_R | PTE_W | PTE_X);
         assert!(!check_permission(pte, true, false, false));
     }

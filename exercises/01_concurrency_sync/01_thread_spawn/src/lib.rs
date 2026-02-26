@@ -1,30 +1,30 @@
-//! # 线程创建
+//! # Thread Creation
 //!
-//! 本练习中，你需要学习如何创建线程并在线程间传递数据。
+//! In this exercise, you will learn how to create threads and pass data between threads.
 //!
-//! ## 知识点
-//! - `std::thread::spawn` 创建新线程
-//! - `move` 闭包捕获变量所有权
-//! - `JoinHandle::join()` 等待线程完成并获取返回值
+//! ## Concepts
+//! - `std::thread::spawn` creates a new thread
+//! - `move` closures capture variable ownership
+//! - `JoinHandle::join()` waits for thread completion and retrieves return value
 
 use std::thread;
 
-/// 在新线程中将向量的每个元素乘以 2，返回结果向量。
+/// Multiply each element of a vector by 2 in a new thread, returning the result vector.
 ///
-/// 提示：使用 `thread::spawn` 和 `move` 闭包。
+/// Hint: Use `thread::spawn` and `move` closure.
 pub fn double_in_thread(numbers: Vec<i32>) -> Vec<i32> {
-    // TODO: 创建一个新线程，将 numbers 中每个元素乘以 2
-    // 使用 thread::spawn 和 move 闭包
-    // 使用 join().unwrap() 获取结果
+    // TODO: Create a new thread to multiply each element of numbers by 2
+    // Use thread::spawn and move closure
+    // Use join().unwrap() to get result
     todo!()
 }
 
-/// 并行地对两个向量分别求和，返回两个和的元组。
+/// Sum two vectors in parallel, returning a tuple of two sums.
 ///
-/// 提示：创建两个线程分别计算。
+/// Hint: Create two threads for each vector.
 pub fn parallel_sum(a: Vec<i32>, b: Vec<i32>) -> (i32, i32) {
-    // TODO: 创建两个线程分别对 a 和 b 求和
-    // 分别 join 两个线程获取结果
+    // TODO: Create two threads to sum a and b respectively
+    // Join both threads to get results
     todo!()
 }
 

@@ -1,45 +1,45 @@
-//! # 进程与管道
+//! # Process and Pipes
 //!
-//! 本练习中，你需要学习如何创建子进程并通过管道进行通信。
+//! In this exercise, you will learn how to create child processes and communicate through pipes.
 //!
-//! ## 知识点
-//! - `std::process::Command` 创建子进程
-//! - `Stdio::piped()` 设置管道
-//! - 通过 stdin/stdout 与子进程通信
-//! - 获取子进程退出状态
+//! ## Concepts
+//! - `std::process::Command` creates child processes
+//! - `Stdio::piped()` sets up pipes
+//! - Communicate with child processes via stdin/stdout
+//! - Obtain child process exit status
 
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 
-/// 执行给定的 shell 命令并返回其 stdout 输出。
+/// Execute the given shell command and return its stdout output.
 ///
-/// 例如：`run_command("echo", &["hello"])` 应返回 `"hello\n"`
+/// For example: `run_command("echo", &["hello"])` should return `"hello\n"`
 pub fn run_command(program: &str, args: &[&str]) -> String {
-    // TODO: 使用 Command::new 创建进程
-    // TODO: 设置 stdout 为 Stdio::piped()
-    // TODO: 用 .output() 执行并获取输出
-    // TODO: 将 stdout 转为 String 返回
+    // TODO: Use Command::new to create process
+    // TODO: Set stdout to Stdio::piped()
+    // TODO: Execute with .output() and get output
+    // TODO: Convert stdout to String and return
     todo!()
 }
 
-/// 通过管道向子进程 (cat) 的 stdin 写入数据，并读取其 stdout 输出。
+/// Write data to child process (cat) stdin via pipe and read its stdout output.
 ///
-/// 这演示了父子进程间的双向管道通信。
+/// This demonstrates bidirectional pipe communication between parent and child processes.
 pub fn pipe_through_cat(input: &str) -> String {
-    // TODO: 创建 "cat" 命令，设置 stdin 和 stdout 为 piped
-    // TODO: spawn 进程
-    // TODO: 向子进程 stdin 写入 input
-    // TODO: drop stdin 以关闭管道（否则 cat 不会退出）
-    // TODO: 从子进程 stdout 读取输出
+    // TODO: Create "cat" command, set stdin and stdout to piped
+    // TODO: Spawn process
+    // TODO: Write input to child process stdin
+    // TODO: Drop stdin to close pipe (otherwise cat won't exit)
+    // TODO: Read output from child process stdout
     todo!()
 }
 
-/// 获取子进程的退出码。
-/// 执行命令 `sh -c {command}` 并返回退出码。
+/// Get child process exit code.
+/// Execute command `sh -c {command}` and return the exit code.
 pub fn get_exit_code(command: &str) -> i32 {
-    // TODO: 使用 Command::new("sh").args(["-c", command])
-    // TODO: 执行并获取 status
-    // TODO: 返回 exit code
+    // TODO: Use Command::new("sh").args(["-c", command])
+    // TODO: Execute and get status
+    // TODO: Return exit code
     todo!()
 }
 

@@ -1,13 +1,13 @@
-//! # RAII 自旋锁守卫
+//! # RAII Spin Lock Guard
 //!
-//! 本练习中，你需要为自旋锁实现 RAII 守卫，使锁在离开作用域时自动释放。
-//! 这是 Rust 所有权系统在系统编程中的经典应用。
+//! In this exercise, you will implement an RAII guard for a spin lock, causing the lock to be automatically released when leaving scope.
+//! This is a classic application of Rust's ownership system in systems programming.
 //!
-//! ## 知识点
-//! - RAII (Resource Acquisition Is Initialization) 模式
-//! - `Deref` / `DerefMut` trait 实现透明访问
-//! - `Drop` trait 实现自动释放
-//! - 为什么手动 lock/unlock 不安全（忘记 unlock、panic 时不释放）
+//! ## Key Points
+//! - RAII (Resource Acquisition Is Initialization) pattern
+//! - `Deref` / `DerefMut` traits for transparent access
+//! - `Drop` trait for automatic release
+//! - Why manual lock/unlock is unsafe (forgetting unlock, panic without release)
 
 use std::cell::UnsafeCell;
 use std::ops::{Deref, DerefMut};
@@ -21,8 +21,8 @@ pub struct SpinLock<T> {
 unsafe impl<T: Send> Sync for SpinLock<T> {}
 unsafe impl<T: Send> Send for SpinLock<T> {}
 
-/// 自旋锁守卫：持有锁的 RAII 句柄。
-/// 当 SpinGuard 被 drop 时自动释放锁。
+/// Spin lock guard: RAII handle holding the lock.
+/// Automatically releases the lock when SpinGuard is dropped.
 pub struct SpinGuard<'a, T> {
     lock: &'a SpinLock<T>,
 }
@@ -35,18 +35,18 @@ impl<T> SpinLock<T> {
         }
     }
 
-    /// 获取锁，返回 SpinGuard。
+    /// Acquire lock, returning SpinGuard.
     ///
-    /// TODO: 自旋等待获取锁（compare_exchange），成功后返回 SpinGuard。
+    /// TODO: Spin-wait to acquire lock (compare_exchange), return SpinGuard on success.
     pub fn lock(&self) -> SpinGuard<'_, T> {
-        // TODO: 自旋获取锁
-        // TODO: 返回 SpinGuard { lock: self }
+        // TODO: Spin-wait to acquire lock
+        // TODO: Return SpinGuard { lock: self }
         todo!()
     }
 }
 
-// TODO: 为 SpinGuard 实现 Deref trait
-// 返回 &T，通过 self.lock.data.get() 获取
+// TODO: Implement Deref trait for SpinGuard
+// Return &T, obtained via self.lock.data.get()
 impl<T> Deref for SpinGuard<'_, T> {
     type Target = T;
 
@@ -55,16 +55,16 @@ impl<T> Deref for SpinGuard<'_, T> {
     }
 }
 
-// TODO: 为 SpinGuard 实现 DerefMut trait
-// 返回 &mut T
+// TODO: Implement DerefMut trait for SpinGuard
+// Return &mut T
 impl<T> DerefMut for SpinGuard<'_, T> {
     fn deref_mut(&mut self) -> &mut T {
         todo!()
     }
 }
 
-// TODO: 为 SpinGuard 实现 Drop trait
-// 将 lock.locked 设为 false（Release ordering）
+// TODO: Implement Drop trait for SpinGuard
+// Set lock.locked to false (Release ordering)
 impl<T> Drop for SpinGuard<'_, T> {
     fn drop(&mut self) {
         todo!()
@@ -83,9 +83,9 @@ mod tests {
         {
             let mut guard = lock.lock();
             *guard = 42;
-            // guard 在此处 drop，自动释放锁
+            // guard drops here, automatically releasing lock
         }
-        // 应该能再次获取锁
+        // Should be able to acquire lock again
         let guard = lock.lock();
         assert_eq!(*guard, 42);
     }
@@ -122,7 +122,7 @@ mod tests {
                 for _ in 0..1000 {
                     let mut guard = l.lock();
                     *guard += 1;
-                    // guard 自动释放
+                    // guard automatically released
                 }
             }));
         }
@@ -146,7 +146,7 @@ mod tests {
         }).join();
 
         assert!(result.is_err());
-        // 即使线程 panic，guard 的 Drop 也应释放锁
-        // 注意：这个测试可能因 panic unwind 行为而有不同结果
+        // Even if thread panics, guard's Drop should release lock
+        // Note: this test may have different results due to panic unwind behavior
     }
 }

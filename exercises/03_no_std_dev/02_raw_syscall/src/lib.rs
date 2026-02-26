@@ -1,25 +1,25 @@
-//! # 原始系统调用
+//! # Raw System Calls
 //!
-//! 本练习中，你需要使用 `core::arch::asm!` 直接发起 Linux 系统调用，
-//! 理解用户态程序与内核的交互方式。
+//! In this exercise, you will use `core::arch::asm!` to make Linux system calls directly,
+//! understanding how user-space programs interact with the kernel.
 //!
-//! ## 知识点
-//! - x86_64 Linux syscall 调用约定
-//! - `asm!` 内联汇编
-//! - 系统调用号（write=1, getpid=39, uname=63）
+//! ## Key Concepts
+//! - x86_64 Linux syscall calling convention
+//! - `asm!` inline assembly
+//! - System call numbers (write=1, getpid=39, uname=63)
 //!
-//! ## x86_64 Linux syscall 约定
-//! - rax: 系统调用号
-//! - 参数: rdi, rsi, rdx, r10, r8, r9
-//! - 返回值: rax
-//! - 被破坏的寄存器: rcx, r11
+//! ## x86_64 Linux Syscall Convention
+//! - rax: system call number
+//! - arguments: rdi, rsi, rdx, r10, r8, r9
+//! - return value: rax
+//! - clobbered registers: rcx, r11
 
 use std::arch::asm;
 
-/// 使用 `write` 系统调用（编号 1）向文件描述符写入数据。
-/// 返回写入的字节数，失败返回负数。
+/// Use the `write` system call (number 1) to write data to a file descriptor.
+/// Returns the number of bytes written, or a negative value on failure.
 ///
-/// 提示：
+/// Hint:
 /// ```text
 /// asm!(
 ///     "syscall",
@@ -34,23 +34,23 @@ use std::arch::asm;
 /// ```
 #[cfg(target_os = "linux")]
 pub fn sys_write(fd: i32, buf: &[u8]) -> isize {
-    // TODO: 使用 asm! 发起 write 系统调用
+    // TODO: Use asm! to make the write system call
     todo!()
 }
 
-/// 使用 `getpid` 系统调用（编号 39）获取当前进程 ID。
+/// Use the `getpid` system call (number 39) to get the current process ID.
 #[cfg(target_os = "linux")]
 pub fn sys_getpid() -> i32 {
-    // TODO: 使用 asm! 发起 getpid 系统调用
-    // getpid 无参数，返回值为进程 ID
+    // TODO: Use asm! to make the getpid system call
+    // getpid has no arguments, returns the process ID
     todo!()
 }
 
-/// 使用 `write` syscall 向 stdout 打印字符串（自动添加换行）。
+/// Use the `write` syscall to print a string to stdout (automatically adds newline).
 #[cfg(target_os = "linux")]
 pub fn sys_println(msg: &str) {
-    // TODO: 调用 sys_write 向 fd=1 (stdout) 写入 msg
-    // TODO: 再写入 "\n"
+    // TODO: Call sys_write to write msg to fd=1 (stdout)
+    // TODO: Then write "\n"
     todo!()
 }
 
@@ -77,13 +77,13 @@ mod tests {
     fn test_sys_getpid() {
         let pid = sys_getpid();
         assert!(pid > 0, "PID should be positive, got {}", pid);
-        // 验证与标准库一致
+        // Verify consistency with standard library
         assert_eq!(pid, std::process::id() as i32);
     }
 
     #[test]
     fn test_sys_println() {
-        // 仅测试不 panic
+        // Just test that it doesn't panic
         sys_println("[sys_println test] hello!");
     }
 

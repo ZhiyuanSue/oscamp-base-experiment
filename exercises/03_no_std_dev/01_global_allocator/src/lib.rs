@@ -1,12 +1,12 @@
-//! # 全局内存分配器
+//! # Global Memory Allocator
 //!
-//! 本练习中，你需要实现一个简单的 Bump 分配器，并理解 `GlobalAlloc` trait 的工作原理。
+//! In this exercise, you will implement a simple Bump allocator and understand how the `GlobalAlloc` trait works.
 //!
-//! ## 知识点
+//! ## Concepts
 //! - `std::alloc::GlobalAlloc` trait
-//! - 内存对齐（alignment）
-//! - 原子操作实现无锁分配
-//! - `#[global_allocator]` 属性
+//! - Memory alignment (alignment)
+//! - Atomic operations for lock‑free allocation
+//! - `#[global_allocator]` attribute
 
 use std::alloc::{GlobalAlloc, Layout};
 use std::cell::UnsafeCell;
@@ -17,8 +17,8 @@ const HEAP_SIZE: usize = 65536;
 #[repr(C, align(4096))]
 struct HeapSpace([u8; HEAP_SIZE]);
 
-/// Bump 分配器：只向前分配，不支持单独释放。
-/// 这是最简单的分配策略，常用于内核早期启动阶段。
+/// Bump allocator: only allocates forward, does not support individual deallocation.
+/// This is the simplest allocation strategy, often used in early kernel boot phase.
 pub struct BumpAllocator {
     heap: UnsafeCell<HeapSpace>,
     next: AtomicUsize,
@@ -34,38 +34,38 @@ impl BumpAllocator {
         }
     }
 
-    /// 重置分配器，释放所有已分配内存。
+    /// Reset the allocator, freeing all allocated memory.
     pub fn reset(&self) {
         self.next.store(0, Ordering::Relaxed);
     }
 
-    /// 返回已使用的字节数。
+    /// Returns number of bytes used.
     pub fn used(&self) -> usize {
         self.next.load(Ordering::Relaxed)
     }
 }
 
-// TODO: 为 BumpAllocator 实现 GlobalAlloc trait
+// TODO: Implement GlobalAlloc trait for BumpAllocator
 //
 // unsafe fn alloc(&self, layout: Layout) -> *mut u8:
-//   1. 获取 heap 的起始地址: self.heap.get() as usize
-//   2. 读取 next 偏移量
-//   3. 计算对齐后的起始位置:
+//   1. Get heap start address: self.heap.get() as usize
+//   2. Read next offset
+//   3. Compute aligned start position:
 //      let aligned = (heap_start + next + layout.align() - 1) & !(layout.align() - 1);
-//   4. 计算新的 next = aligned - heap_start + layout.size()
-//   5. 如果 new_next > HEAP_SIZE，返回 std::ptr::null_mut()
-//   6. 更新 self.next（使用 store 即可，单线程测试场景）
-//   7. 返回 aligned as *mut u8
+//   4. Compute new next = aligned - heap_start + layout.size()
+//   5. If new_next > HEAP_SIZE, return std::ptr::null_mut()
+//   6. Update self.next (store is enough for single‑threaded test scenario)
+//   7. Return aligned as *mut u8
 //
 // unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout):
-//   Bump 分配器不支持单独释放，留空即可。
+//   Bump allocator does not support individual deallocation, leave empty.
 unsafe impl GlobalAlloc for BumpAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         todo!()
     }
 
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
-        // Bump allocator 不支持单独释放
+        // Bump allocator does not support individual deallocation
     }
 }
 
@@ -87,11 +87,11 @@ mod tests {
     #[test]
     fn test_alignment() {
         TEST_ALLOCATOR.reset();
-        // 先分配 1 字节（对齐 1）
+        // First allocate 1 byte (alignment 1)
         let layout1 = Layout::from_size_align(1, 1).unwrap();
         unsafe { TEST_ALLOCATOR.alloc(layout1) };
 
-        // 再分配 8 字节（对齐 8）
+        // Then allocate 8 bytes (alignment 8)
         let layout2 = Layout::from_size_align(8, 8).unwrap();
         let ptr2 = unsafe { TEST_ALLOCATOR.alloc(layout2) };
         assert!(!ptr2.is_null());
@@ -108,7 +108,7 @@ mod tests {
         assert!(!p1.is_null());
         assert!(!p2.is_null());
         assert_ne!(p1, p2);
-        // 两次分配不应重叠
+        // Two allocations should not overlap
         let diff = (p2 as usize).abs_diff(p1 as usize);
         assert!(diff >= 1024);
     }
