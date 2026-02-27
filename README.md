@@ -6,7 +6,7 @@ Learn Rust concurrency programming, async programming, `no_std` development, and
 ## Prerequisites
 
 - Rust toolchain (stable, >= 1.75)
-- Linux x86_64 environment (some exercises involve syscall and inline assembly)
+- Linux 环境：多数练习为 x86_64；**第四章（上下文切换）仅支持 riscv64**，需在 riscv64 环境或使用 QEMU 用户态运行
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -44,12 +44,14 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 | 4 | `04_spinlock_guard` | RAII guard, `Deref`/`DerefMut`/`Drop` |
 | 5 | `05_rwlock` | Writer-priority read-write lock from scratch (no `std::sync::RwLock`) |
 
-### Module 4: Context Switching — `04_context_switch/`
+### Module 4: Context Switching — `04_context_switch/`（仅 riscv64）
 
 | # | Exercise | Concepts |
 |---|----------|----------|
 | 1 | `01_stack_coroutine` | Callee-saved registers, stack frames, context switching |
 | 2 | `02_green_threads` | Green thread scheduler, cooperative scheduling, yield |
+
+第四章仅在 **riscv64** 下运行；与整仓一致：直接执行 `./check.sh` 或使用 `oscamp` 即可，无需单独脚本。详见 `exercises/04_context_switch/README.md`。
 
 ### Module 5: Async Programming — `05_async_programming/`
 
@@ -131,9 +133,8 @@ cargo test --workspace
 
 ## Notes
 
-- Some exercises in Module 2 and Module 4 require **Linux x86_64** environment
-- Tests with `#[cfg(target_os = "linux")]` or `#[cfg(target_arch = "x86_64")]` are skipped on other platforms
-- Recommended to follow the module order shown above; exercises within each module are progressive
+- 部分练习（如 Module 2 系统调用、Module 4 汇编）需 **Linux** 环境；Module 4 仅支持 **riscv64**
+- 建议按模块顺序完成；同一模块内题目由浅入深
 
 ## License
 
