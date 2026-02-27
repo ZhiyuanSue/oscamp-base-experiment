@@ -274,6 +274,21 @@ Drop for SpinGuard:
 
 RAII benefit: even panic automatically releases lock (Drop called during unwind)"""
 
+[[exercise]]
+name = "Read-Write Lock (Writer-Priority)"
+package = "rwlock"
+path = "exercises/03_os_concurrency/05_rwlock/src/lib.rs"
+module = "OS Concurrency Advanced"
+description = "Implement writer-priority RwLock from scratch using atomics; no std::sync::RwLock"
+hint = """
+Rust provides std::sync::RwLock; this exercise implements a minimal writer-priority version for learning.
+
+State in one AtomicU32: reader_count (low bits), WRITER_HOLDING, WRITER_WAITING. Writer-priority: set WRITER_WAITING before waiting so new readers block.
+
+read: spin until !WRITER_HOLDING && !WRITER_WAITING, then CAS increment reader count. Release: fetch_sub(1).
+write: fetch_or(WRITER_WAITING); spin until no readers and no holder; CAS(WRITER_WAITING, WRITER_HOLDING). Release: fetch_and(!(WRITER_HOLDING|WRITER_WAITING)).
+Guards: Deref/DerefMut and Drop to release."""
+
 # ============================================================
 #  Module 4: Context Switching
 # ============================================================

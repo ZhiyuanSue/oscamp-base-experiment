@@ -27,6 +27,7 @@ exercises=(
     "03_os_concurrency:atomic_ordering:内存序"
     "03_os_concurrency:spinlock:自旋锁"
     "03_os_concurrency:spinlock_guard:RAII自旋锁守卫"
+    "03_os_concurrency:rwlock:读写锁(写者优先)"
     "04_context_switch:stack_coroutine:有栈协程"
     "04_context_switch:green_threads:绿色线程"
     "05_async_programming:basic_future:手动实现Future"

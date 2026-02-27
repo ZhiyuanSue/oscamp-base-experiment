@@ -14,7 +14,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 ## Exercise Structure
 
-**6 modules, 22 exercises** in total, from easy to advanced:
+**6 modules, 23 exercises** in total, from easy to advanced:
 
 ### Module 1: Concurrency (Synchronous) — `01_concurrency_sync/`
 
@@ -42,6 +42,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 | 2 | `02_atomic_ordering` | Memory ordering, Release-Acquire, `OnceCell` |
 | 3 | `03_spinlock` | Spinlock implementation, `compare_exchange`, `spin_loop` |
 | 4 | `04_spinlock_guard` | RAII guard, `Deref`/`DerefMut`/`Drop` |
+| 5 | `05_rwlock` | Writer-priority read-write lock from scratch (no `std::sync::RwLock`) |
 
 ### Module 4: Context Switching — `04_context_switch/`
 

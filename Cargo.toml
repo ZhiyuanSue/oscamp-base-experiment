@@ -13,6 +13,7 @@ members = [
     "exercises/03_os_concurrency/02_atomic_ordering",
     "exercises/03_os_concurrency/03_spinlock",
     "exercises/03_os_concurrency/04_spinlock_guard",
+    "exercises/03_os_concurrency/05_rwlock",
     "exercises/04_context_switch/01_stack_coroutine",
     "exercises/04_context_switch/02_green_threads",
     "exercises/05_async_programming/01_basic_future",
